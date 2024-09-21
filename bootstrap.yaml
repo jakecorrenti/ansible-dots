@@ -73,6 +73,15 @@
       args:
         chdir: "{{ ansible_env.HOME }}/alacritty"
 
+    - name: Install Go v.1.23.1
+      become: true
+      shell: |
+        wget https://dl.google.com/go/go1.23.1.linux-amd64.tar.gz
+        tar -C /usr/local -xzf go1.23.1.linux-amd64.tar.gz
+        rm go1.23.1.linux-amd64.tar.gz
+      args:
+        chdir: "{{ ansible_env.HOME }}/alacritty"
+
     - name: Install tmux
       become: true
       ansible.builtin.dnf:
@@ -102,6 +111,7 @@
           - btop
           - neofetch
           - python3
+          - clang
         state: present
       when: ansible_distribution == "Fedora"
 
@@ -143,7 +153,34 @@
       ansible.builtin.dnf:
         name:
           - hyprland
+          - dunst
           - waybar
         state: present
       when: ansible_distribution == "Fedora"
 
+    - name: Clone dotfiles repo
+      git:
+        # repo: https://github.com/jakecorrenti/dotfiles.git
+        repo: git@github.com:jakecorrenti/dotfiles.git
+        dest: "{{ ansible_env.HOME }}/dotfiles"
+        clone: true
+
+    - name: Move dotfiles from repo to .config
+      shell: |
+        mv "{{ ansible_env.HOME }}/dotfiles/nvim" "{{ ansible_env.HOME }}/.config/"
+        mv "{{ ansible_env.HOME }}/dotfiles/hypr" "{{ ansible_env.HOME }}/.config/"
+        mv "{{ ansible_env.HOME }}/dotfiles/alacritty" "{{ ansible_env.HOME }}/.config/"
+        mv "{{ ansible_env.HOME }}/dotfiles/waybar" "{{ ansible_env.HOME }}/.config/"
+        mv "{{ ansible_env.HOME }}/dotfiles/.git" "{{ ansible_env.HOME }}/.config/"
+        cp "{{ ansible_env.HOME }}/dotfiles/.tmux.conf" "{{ ansible_env.HOME }}/.config/.tmux.conf"
+        cp "{{ ansible_env.HOME }}/dotfiles/.zshrc" "{{ ansible_env.HOME }}/.config/.zshrc"
+        cp "{{ ansible_env.HOME }}/dotfiles/README.md" "{{ ansible_env.HOME }}/.config/README.md"
+      args:
+        chdir: "{{ ansible_env.HOME }}/"
+
+    - name: Set dotfiles symlinks
+      shell: |
+        ln -s "{{ ansible_env.HOME }}"/.config/.tmux.conf" "{{ ansible_env.HOME }}/.tmux.conf"
+        ln -s "{{ ansible_env.HOME }}"/.config/.zshrc" "{{ ansible_env.HOME }}/.zshrc"
+      args:
+        chdir: "{{ ansible_env.HOME }}/"

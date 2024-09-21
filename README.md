@@ -3,6 +3,8 @@
 Dotfile management with Ansible playbooks
 
 ## Pre-requisites
+**NOTE: Configure SSH and GPG keys for GitHub before starting**
+
 Ensure that you have [Ansible installed](https://docs.ansible.com/ansible/2.9/installation_guide/intro_installation.html)
 ```bash
 sudo dnf install ansible
