@@ -1,0 +1,149 @@
+- name: Configure development environment
+  hosts: localhost
+
+  tasks:
+    - name: Install git
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - git
+        state: present
+      when: ansible_distribution == "Fedora"
+      
+    - name: Install rust and tools
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - rust
+          - cargo
+          - clippy
+          - rust-src
+          - rustfmt
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Install rust tools
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - git-delta
+          - bat
+          - exa
+          - ripgrep
+        state: present
+      when: ansible_distribution == "Fedora"
+      
+    - name: Clone alacritty terminal source code
+      git:
+        repo: https://github.com/alacritty/alacritty
+        dest: "{{ ansible_env.HOME }}/alacritty"
+        clone: true
+
+    - name: Install alacritty terminal dependencies
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - cmake
+          - freetype-devel
+          - fontconfig-devel
+          - libxcb-devel
+          - libxkbcommon-devel
+          - g++
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Build alacritty terminal
+      shell: cargo build --release
+      args:
+        chdir: "{{ ansible_env.HOME }}/alacritty"
+
+    - name: Set alacritty terminfo
+      become: true
+      shell: tic -xe alacritty,alacritty-direct extra/alacritty.info
+      args:
+        chdir: "{{ ansible_env.HOME }}/alacritty"
+
+    - name: Set alacritty Desktop Entry
+      become: true
+      shell: |
+        cp target/release/alacritty /usr/local/bin
+        cp extra/logo/alacritty-term.svg /usr/share/pixmaps/Alacritty.svg
+        desktop-file-install extra/linux/Alacritty.desktop
+        update-desktop-database
+      args:
+        chdir: "{{ ansible_env.HOME }}/alacritty"
+
+    - name: Install tmux
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - tmux
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Install tmux package manager
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: ~/.tmux/plugins/tpm
+        clone: true 
+
+    - name: Install zsh
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - zsh
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Install misc packages
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - btop
+          - neofetch
+          - python3
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Install neovim prerequisites
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - ninja-build
+          - cmake
+          - gcc
+          - make
+          - unzip
+          - gettext
+          - curl
+          - glibc-gconv-extra
+        state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Clone neovim repo
+      git:
+        repo: https://github.com/neovim/neovim.git
+        dest: "{{ ansible_env.HOME }}/neovim"
+        clone: true
+
+    - name: Build nvim
+      community.general.make:
+        chdir: "{{ ansible_env.HOME }}/neovim"
+        params:
+          CMAKE_BUILD_TYPE: RelWithDebInfo
+
+    - name: Install neovim from source
+      become: true
+      community.general.make:
+        chdir: "{{ ansible_env.HOME }}/neovim"
+        target: install
+
+    - name: Install hyprland
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - hyprland
+          - waybar
+        state: present
+      when: ansible_distribution == "Fedora"
+
