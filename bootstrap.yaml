@@ -160,7 +160,6 @@
 
     - name: Clone dotfiles repo
       git:
-        # repo: https://github.com/jakecorrenti/dotfiles.git
         repo: git@github.com:jakecorrenti/dotfiles.git
         dest: "{{ ansible_env.HOME }}/dotfiles"
         clone: true
@@ -184,3 +183,57 @@
         ln -s "{{ ansible_env.HOME }}"/.config/.zshrc" "{{ ansible_env.HOME }}/.zshrc"
       args:
         chdir: "{{ ansible_env.HOME }}/"
+    
+    - name: Clone jakecorrenti/tdx
+      git:
+        repo: git@github.com:jakecorrenti/tdx.git
+        dest: "{{ ansible_env.HOME }}/tdx"
+        clone: true
+
+    - name: Clone jakecorrenti/tdxhost
+      git:
+        repo: git@github.com:jakecorrenti/tdxhost.git
+        dest: "{{ ansible_env.HOME }}/tdxhost"
+        clone: true
+
+    - name: Clone jakecorrenti/libkrun
+      git:
+        repo: git@github.com:jakecorrenti/libkrun.git
+        dest: "{{ ansible_env.HOME }}/libkrun"
+        clone: true
+
+    - name: Clone jakecorrenti/libkrunfw
+      git:
+        repo: git@github.com:jakecorrenti/libkrunfw.git
+        dest: "{{ ansible_env.HOME }}/libkrunfw"
+        clone: true
+
+    - name: Clone slp/qboot-krunfw
+      git:
+        repo: git@github.com:slp/qboot-krunfw.git
+        dest: "{{ ansible_env.HOME }}/qboot-krunfw"
+        clone: true
+
+    - name: mkdir Golang working directories
+      shell: |
+        mkdir -p go/src/github.com/containers/
+      args:
+        chdir: "{{ ansible_env.HOME }}/"
+
+    - name: Clone jakecorrenti/podman
+      git:
+        repo: git@github.com:jakecorrenti/podman.git
+        dest: "{{ ansible_env.HOME }}/go/src/github.com/containers/podman"
+        clone: true
+
+    - name: Clone tdx-devel/qemu-kvm-centos-stream
+      git:
+        repo: https://gitlab.com/tdx-devel/qemu-kvm-centos-stream
+        dest: "{{ ansible_env.HOME }}/qemu-kvm-centos-stream"
+        clone: true
+
+    - name: Clone tdx-devel/kernel-centos-stream-9
+      git:
+        repo: https://gitlab.com/tdx-devel/kernel-centos-stream-9
+        dest: "{{ ansible_env.HOME }}/kernel-centos-stream-9"
+        clone: true
