@@ -148,13 +148,14 @@
         chdir: "{{ ansible_env.HOME }}/neovim"
         target: install
 
-    - name: Install hyprland
+    - name: Install i3
       become: true
       ansible.builtin.dnf:
         name:
-          - hyprland
+          - i3
           - dunst
-          - waybar
+          - i3status
+          - rofi
         state: present
       when: ansible_distribution == "Fedora"
 
@@ -167,7 +168,7 @@
     - name: Move dotfiles from repo to .config
       shell: |
         mv "{{ ansible_env.HOME }}/dotfiles/nvim" "{{ ansible_env.HOME }}/.config/"
-        mv "{{ ansible_env.HOME }}/dotfiles/hypr" "{{ ansible_env.HOME }}/.config/"
+        mv "{{ ansible_env.HOME }}/dotfiles/i3" "{{ ansible_env.HOME }}/.config/"
         mv "{{ ansible_env.HOME }}/dotfiles/alacritty" "{{ ansible_env.HOME }}/.config/"
         mv "{{ ansible_env.HOME }}/dotfiles/waybar" "{{ ansible_env.HOME }}/.config/"
         mv "{{ ansible_env.HOME }}/dotfiles/.git" "{{ ansible_env.HOME }}/.config/"
